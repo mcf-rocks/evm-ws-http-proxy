@@ -97,8 +97,18 @@ async function passthroughRPC(json: object, ws: WebSocket) {
   }
 }
 
+wss.on("error", (err) => {
+  logger.error(`WebSocket server error: ${err.message}`);
+});
+
 wss.on("connection", (ws: WebSocket) => {
   logger.info("New client connected");
+
+  ws.on("error", (err) => {
+    logger.error(`WebSocket error: ${err.message}`);
+    // optionally close the socket cleanly
+    try { ws.terminate(); } catch {}
+  });
 
   ws.on("message", (message: string) => {
     logger.debug(`Received message: ${message}`);
